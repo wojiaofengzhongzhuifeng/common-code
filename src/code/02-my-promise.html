@@ -45,10 +45,28 @@
       return new MyPromise((resolve, reject) => {
         if (this.status === 'FULLFILLED') {
           let x = successFn(this.successData)
-          resolve(x)
+
+          if(x instanceof MyPromise){
+            x.then((data)=>{
+              resolve(data)
+            })
+          } else {
+            reject(x)
+          }
+
+
         } else if (this.status === 'REJECT') {
           let x = failFn(this.failReason)
-          reject(x)
+
+          if(x instanceof MyPromise){
+            x.then(null, (data)=>{
+              reject(data)
+            })
+          } else {
+            reject(x)
+          }
+
+
         } else {
           this.successFn.push(successFn)
           this.failFn.push(failFn)
@@ -121,6 +139,26 @@
   }).then((biggerPoint5Number)=>{
     console.log('promise4 chain then resolve biggerPoint5Number', biggerPoint5Number);
   })
+
+  let promise5 = new Promise((resolve)=>{
+    setTimeout(()=>{
+      let math = Math.random()
+      resolve(math)
+    }, 1000)
+  })
+  promise5.then((biggerPoint5Number)=>{
+    console.log('promise5 resolve biggerPoint5Number', biggerPoint5Number);
+    let promise = new MyPromise((resolve, reject)=>{
+      setTimeout(()=>{
+        resolve(222 + biggerPoint5Number)
+      }, 2000)
+    })
+    return promise
+  }).then((biggerPoint5Number)=>{
+    console.log('promise5 chain then resolve biggerPoint5Number', biggerPoint5Number);
+  })
+
+
 
 </script>
 </body>
