@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+<script>
+
+  class MyPromise{
+    status = 'PENDING' // FULLFILLED / REJECT
+    successData = null
+    failReason = null
+
+    constructor(exec) {
+      exec(this.resolve, this.reject)
+    }
+
+    resolve = (successData)=>{
+      this.status = 'FULLFILLED'
+      this.successData = successData
+    }
+
+    reject = (failReason)=>{
+      this.status = 'REJECT'
+      this.failReason = failReason
+    }
+
+    then = (successFn, failFn)=>{
+      if(this.status === 'FULLFILLED'){
+        successFn(this.successData)
+      } else if (this.status === 'REJECT'){
+        failFn(this.failReason)
+      }
+    }
+  }
+
+  let promise1 = new MyPromise((resolve, reject)=>{
+    let math = Math.random()
+    if(math >0.5){
+      resolve(math)
+    } else {
+      reject(math)
+    }
+  })
+  promise1.then((biggerPoint5Number)=>{
+    console.log('biggerPoint5Number', biggerPoint5Number);
+  }, (smallerPoint5Number)=>{
+    console.log('smallerPoint5Number', smallerPoint5Number);
+  })
+</script>
+</body>
+</html>
