@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+
+<body>
+<script>
+  function request(params) {
+    return new Promise((resolve) => setTimeout(resolve, 1000, params));
+  }
+
+  class MyQueue{
+    constructor() {
+      this.limitNumber = 3
+      this.currentRunNumber = 0
+      this.needToRunPromiseList = []
+    }
+
+    add = (url)=>{
+      return new Promise((resolve)=>{
+        this.needToRunPromiseList.push([url, resolve])
+        this.run()
+      })
+    }
+
+    run = ()=>{
+      if(this.currentRunNumber === this.limitNumber || this.needToRunPromiseList.length === 0){
+        return
+      }
+
+      const [url, resolve] = this.needToRunPromiseList.shift()
+      request(url).then((responseData)=>{
+        resolve(responseData + url)
+      }).finally(()=>{
+        this.currentRunNumber--
+        this.run()
+      })
+    }
+  }
+
+  const myQueue1 = new MyQueue();
+
+  for (let i = 0; i < 10; i++) {
+    myQueue1.add(i).then((result)=>{
+      console.log(result);
+    });
+  }
+</script>
+</body>
+</html>
