@@ -42,14 +42,18 @@
     }
 
     then = (successFn, failFn)=>{
-      if(this.status === 'FULLFILLED'){
-        successFn(this.successData)
-      } else if (this.status === 'REJECT'){
-        failFn(this.failReason)
-      } else {
-        this.successFn.push(successFn)
-        this.failFn.push(failFn)
-      }
+      return new MyPromise((resolve, reject) => {
+        if (this.status === 'FULLFILLED') {
+          let x = successFn(this.successData)
+          resolve(x)
+        } else if (this.status === 'REJECT') {
+          let x = failFn(this.failReason)
+          reject(x)
+        } else {
+          this.successFn.push(successFn)
+          this.failFn.push(failFn)
+        }
+      })
     }
   }
 
@@ -104,6 +108,20 @@
   }, (smallerPoint5Number)=>{
     console.log('promise3 reject smallerPoint5Number', smallerPoint5Number);
   })
+
+  let promise4 = new Promise((resolve)=>{
+    setTimeout(()=>{
+      let math = Math.random()
+      resolve(math)
+    }, 1000)
+  })
+  promise4.then((biggerPoint5Number)=>{
+    console.log('promise4 resolve biggerPoint5Number', biggerPoint5Number);
+    return biggerPoint5Number + 1
+  }).then((biggerPoint5Number)=>{
+    console.log('promise4 chain then resolve biggerPoint5Number', biggerPoint5Number);
+  })
+
 </script>
 </body>
 </html>
