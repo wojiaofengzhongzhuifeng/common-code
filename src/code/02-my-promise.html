@@ -14,6 +14,8 @@
     status = 'PENDING' // FULLFILLED / REJECT
     successData = null
     failReason = null
+    successFn = null
+    failFn = null
 
     constructor(exec) {
       exec(this.resolve, this.reject)
@@ -22,11 +24,13 @@
     resolve = (successData)=>{
       this.status = 'FULLFILLED'
       this.successData = successData
+      this.successFn && this.successFn(this.successData)
     }
 
     reject = (failReason)=>{
       this.status = 'REJECT'
       this.failReason = failReason
+      this.failFn && this.failFn(this.failReason)
     }
 
     then = (successFn, failFn)=>{
@@ -34,6 +38,9 @@
         successFn(this.successData)
       } else if (this.status === 'REJECT'){
         failFn(this.failReason)
+      } else {
+        this.successFn = successFn
+        this.failFn = failFn
       }
     }
   }
@@ -50,6 +57,22 @@
     console.log('biggerPoint5Number', biggerPoint5Number);
   }, (smallerPoint5Number)=>{
     console.log('smallerPoint5Number', smallerPoint5Number);
+  })
+
+  let promise2 = new MyPromise((resolve, reject)=>{
+    setTimeout(()=>{
+      let math = Math.random()
+      if(math >0.5){
+        resolve(math)
+      } else {
+        reject(math)
+      }
+    }, 1000)
+  })
+  promise2.then((biggerPoint5Number)=>{
+    console.log('async biggerPoint5Number', biggerPoint5Number);
+  }, (smallerPoint5Number)=>{
+    console.log('async smallerPoint5Number', smallerPoint5Number);
   })
 </script>
 </body>
