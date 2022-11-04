@@ -14,8 +14,8 @@
     status = 'PENDING' // FULLFILLED / REJECT
     successData = null
     failReason = null
-    successFn = null
-    failFn = null
+    successFn = []
+    failFn = []
 
     constructor(exec) {
       exec(this.resolve, this.reject)
@@ -24,13 +24,21 @@
     resolve = (successData)=>{
       this.status = 'FULLFILLED'
       this.successData = successData
-      this.successFn && this.successFn(this.successData)
+      // 从数组中取出第一个成功函数，执行，并且将这个函数从数组移除
+      while (this.successFn.length !== 0){
+        let firstSuccess = this.successFn.shift()
+        firstSuccess(this.successData)
+      }
     }
 
     reject = (failReason)=>{
       this.status = 'REJECT'
       this.failReason = failReason
-      this.failFn && this.failFn(this.failReason)
+      // 从数组中取出第一个失败函数，执行，并且将这个函数从数组移除
+      while (this.failFn.length !== 0){
+        let firstFail = this.failFn.shift()
+        firstFail(this.failReason)
+      }
     }
 
     then = (successFn, failFn)=>{
@@ -39,8 +47,8 @@
       } else if (this.status === 'REJECT'){
         failFn(this.failReason)
       } else {
-        this.successFn = successFn
-        this.failFn = failFn
+        this.successFn.push(successFn)
+        this.failFn.push(failFn)
       }
     }
   }
@@ -73,6 +81,28 @@
     console.log('async biggerPoint5Number', biggerPoint5Number);
   }, (smallerPoint5Number)=>{
     console.log('async smallerPoint5Number', smallerPoint5Number);
+  })
+
+
+  let promise3 = new MyPromise((resolve, reject)=>{
+    setTimeout(()=>{
+      let math = Math.random()
+      if(math >0.5){
+        resolve(math)
+      } else {
+        reject(math)
+      }
+    }, 1000)
+  })
+  promise3.then((biggerPoint5Number)=>{
+    console.log('promise3 resolve biggerPoint5Number', biggerPoint5Number);
+  }, (smallerPoint5Number)=>{
+    console.log('promise3 reject smallerPoint5Number', smallerPoint5Number);
+  })
+  promise3.then((biggerPoint5Number)=>{
+    console.log('promise3 resolve biggerPoint5Number', biggerPoint5Number);
+  }, (smallerPoint5Number)=>{
+    console.log('promise3 reject smallerPoint5Number', smallerPoint5Number);
   })
 </script>
 </body>
